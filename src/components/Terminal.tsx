@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import TerminalHeader from './TerminalHeader'
 import WelcomeBox from './WelcomeBox'
 import CommandInput from './CommandInput'
@@ -20,6 +20,7 @@ export default function Terminal() {
   const [nickname, setNickname, isClient] = useLocalStorage('nickname', '')
   const [waitingForNickname, setWaitingForNickname] = useState(false)
   const [lastLoginTime, setLastLoginTime] = useState('')
+  const [isShowingAllCommands, setIsShowingAllCommands] = useState(false)
   const terminalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -35,13 +36,13 @@ export default function Terminal() {
     }
   }, [isClient])
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       if (terminalRef.current) {
         terminalRef.current.scrollTop = terminalRef.current.scrollHeight
       }
     }, 100)
-  }
+  }, [])
 
   const getTimestamp = () => {
     return isClient ? getCurrentTimestamp() : ''
@@ -124,7 +125,9 @@ export default function Terminal() {
           {/* Terminal Content */}
           <div 
             ref={terminalRef}
-            className="p-3 sm:p-4 lg:p-6 max-h-[75vh] sm:max-h-[70vh] overflow-y-auto"
+            className={`p-3 sm:p-4 lg:p-6 overflow-y-auto ${
+              isShowingAllCommands ? 'max-h-none pb-64' : 'max-h-[75vh] sm:max-h-[70vh] pb-12'
+            }`}
           >
             {/* Welcome Box */}
             <WelcomeBox isFirstVisit={isFirstVisit} />
@@ -162,10 +165,14 @@ export default function Terminal() {
             </div>
             
             {/* Command Input */}
-            <CommandInput 
-              onCommandExecute={handleCommandExecute}
-              commands={COMMANDS}
-            />
+            <div className="mt-6">
+              <CommandInput 
+                onCommandExecute={handleCommandExecute}
+                commands={COMMANDS}
+                onScrollToBottom={scrollToBottom}
+                onShowingAllCommands={setIsShowingAllCommands}
+              />
+            </div>
           </div>
         </div>
         

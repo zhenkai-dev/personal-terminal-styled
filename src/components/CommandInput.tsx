@@ -10,9 +10,11 @@ interface Command {
 interface CommandInputProps {
   onCommandExecute: (command: string) => void
   commands: Command[]
+  onScrollToBottom?: () => void
+  onShowingAllCommands?: (isShowing: boolean) => void
 }
 
-export default function CommandInput({ onCommandExecute, commands }: CommandInputProps) {
+export default function CommandInput({ onCommandExecute, commands, onScrollToBottom, onShowingAllCommands }: CommandInputProps) {
   const [input, setInput] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [filteredCommands, setFilteredCommands] = useState<Command[]>([])
@@ -31,12 +33,24 @@ export default function CommandInput({ onCommandExecute, commands }: CommandInpu
       setFilteredCommands(commands)
       setShowSuggestions(true)
       setSelectedIndex(-1)
+      // Auto-scroll to bottom to show all commands
+      if (onScrollToBottom) {
+        onScrollToBottom()
+      }
+      // Notify parent that we're showing all commands
+      if (onShowingAllCommands) {
+        onShowingAllCommands(true)
+      }
     } else {
       setShowSuggestions(false)
       setFilteredCommands([])
       setSelectedIndex(-1)
+      // Notify parent that we're not showing all commands
+      if (onShowingAllCommands) {
+        onShowingAllCommands(false)
+      }
     }
-  }, [input, commands])
+  }, [input, commands, onScrollToBottom, onShowingAllCommands])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -112,21 +126,21 @@ export default function CommandInput({ onCommandExecute, commands }: CommandInpu
         />
       </div>
 
-      {/* Suggestions Dropdown */}
+      {/* Command Suggestions */}
       {showSuggestions && filteredCommands.length > 0 && (
-        <div className="absolute top-full left-0 right-0 bg-terminal-bg border border-terminal-border rounded-b max-h-64 overflow-y-auto z-10 touch-manipulation">
+        <div className="mt-4 text-terminal-text">
           {filteredCommands.map((command, index) => (
             <div
               key={command.name}
               onClick={() => handleSuggestionClick(command)}
-              className={`px-3 sm:px-4 py-3 sm:py-2 cursor-pointer text-sm touch-manipulation ${
+              className={`flex items-start cursor-pointer py-1 px-2 -mx-2 rounded ${
                 index === selectedIndex 
-                  ? 'bg-primary bg-opacity-20 text-primary' 
-                  : 'text-terminal-text hover:bg-gray-800 active:bg-gray-700'
+                  ? 'bg-primary bg-opacity-10' 
+                  : 'hover:bg-gray-800'
               }`}
             >
-              <div className="font-mono text-primary text-sm sm:text-sm">{command.name}</div>
-              <div className="text-xs text-gray-400 mt-1 leading-relaxed">{command.description}</div>
+              <span className="font-mono text-primary min-w-[200px]">{command.name}</span>
+              <span className="text-gray-400 text-sm">{command.description}</span>
             </div>
           ))}
         </div>
