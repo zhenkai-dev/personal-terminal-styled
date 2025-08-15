@@ -11,20 +11,48 @@ interface CommandInputProps {
   onCommandExecute: (command: string) => void
   commands: Command[]
   onScrollToBottom?: () => void
-  onShowingAllCommands?: (isShowing: boolean) => void
+  terminalRef?: React.RefObject<HTMLDivElement>
 }
 
-export default function CommandInput({ onCommandExecute, commands, onScrollToBottom, onShowingAllCommands }: CommandInputProps) {
+export default function CommandInput({ onCommandExecute, commands, onScrollToBottom, terminalRef }: CommandInputProps) {
   const [input, setInput] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [filteredCommands, setFilteredCommands] = useState<Command[]>([])
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
+  const commandContainerRef = useRef<HTMLDivElement>(null)
+
+  const scrollToShowSuggestions = () => {
+    if (terminalRef?.current && commandContainerRef.current) {
+      const terminal = terminalRef.current
+      const commandContainer = commandContainerRef.current
+      
+      // Get the position of the command container relative to the terminal
+      const terminalRect = terminal.getBoundingClientRect()
+      const commandRect = commandContainer.getBoundingClientRect()
+      
+      // Calculate how much we need to scroll to show the input and suggestions
+      const commandTop = commandRect.top - terminalRect.top + terminal.scrollTop
+      const commandBottom = commandTop + commandRect.height
+      
+      // If the command container is not fully visible, scroll to show it
+      const terminalHeight = terminal.clientHeight
+      const currentScrollTop = terminal.scrollTop
+      
+      if (commandBottom > currentScrollTop + terminalHeight) {
+        // Scroll to show the bottom of the suggestions with some padding
+        terminal.scrollTo({
+          top: commandBottom - terminalHeight + 20,
+          behavior: 'smooth'
+        })
+      }
+    }
+  }
 
   useEffect(() => {
     if (input.startsWith('/') && input.length > 1) {
       const filtered = commands.filter(cmd => 
-        cmd.name.toLowerCase().includes(input.toLowerCase().slice(1))
+        cmd.name.toLowerCase().startsWith(input.toLowerCase())
       )
       setFilteredCommands(filtered)
       setShowSuggestions(filtered.length > 0)
@@ -33,24 +61,14 @@ export default function CommandInput({ onCommandExecute, commands, onScrollToBot
       setFilteredCommands(commands)
       setShowSuggestions(true)
       setSelectedIndex(-1)
-      // Auto-scroll to bottom to show all commands
-      if (onScrollToBottom) {
-        onScrollToBottom()
-      }
-      // Notify parent that we're showing all commands
-      if (onShowingAllCommands) {
-        onShowingAllCommands(true)
-      }
+      // Scroll to show suggestions after a short delay to allow rendering
+      setTimeout(scrollToShowSuggestions, 100)
     } else {
       setShowSuggestions(false)
       setFilteredCommands([])
       setSelectedIndex(-1)
-      // Notify parent that we're not showing all commands
-      if (onShowingAllCommands) {
-        onShowingAllCommands(false)
-      }
     }
-  }, [input, commands, onScrollToBottom, onShowingAllCommands])
+  }, [input, commands, onScrollToBottom])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -85,10 +103,18 @@ export default function CommandInput({ onCommandExecute, commands, onScrollToBot
       setSelectedIndex(-1)
     } else if (e.key === 'Tab') {
       e.preventDefault()
-      if (selectedIndex >= 0 && filteredCommands[selectedIndex]) {
-        setInput(filteredCommands[selectedIndex].name)
-        setShowSuggestions(false)
-        setSelectedIndex(-1)
+      if (showSuggestions && filteredCommands.length > 0) {
+        // If there's a selected suggestion, use it
+        if (selectedIndex >= 0 && filteredCommands[selectedIndex]) {
+          setInput(filteredCommands[selectedIndex].name)
+          setShowSuggestions(false)
+          setSelectedIndex(-1)
+        } else {
+          // If no selection, auto-complete with the first match
+          setInput(filteredCommands[0].name)
+          setShowSuggestions(false)
+          setSelectedIndex(-1)
+        }
       }
     }
   }
@@ -107,7 +133,7 @@ export default function CommandInput({ onCommandExecute, commands, onScrollToBot
   }, [])
 
   return (
-    <div className="relative">
+    <div ref={commandContainerRef} className="relative">
       {/* Command Input */}
       <div className="flex items-center bg-terminal-bg border border-terminal-border rounded p-3 touch-manipulation">
         <span className="text-terminal-text mr-2">&gt;</span>

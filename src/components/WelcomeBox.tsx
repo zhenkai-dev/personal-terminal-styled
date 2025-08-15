@@ -11,8 +11,13 @@ interface WelcomeBoxProps {
 export default function WelcomeBox({ isFirstVisit }: WelcomeBoxProps) {
   const [nickname] = useLocalStorage('nickname', '')
   const [greetingInfo, setGreetingInfo] = useState(getTimeBasedGreeting())
+  const [randomEmoji, setRandomEmoji] = useState('😀') // Default emoji for SSR
 
   useEffect(() => {
+    // Set random emoji on client side only
+    const emojis = ['😀', '😃', '😄', '😁', '☺️', '😊']
+    setRandomEmoji(emojis[Math.floor(Math.random() * emojis.length)])
+
     // Update greeting every minute
     const interval = setInterval(() => {
       setGreetingInfo(getTimeBasedGreeting())
@@ -23,9 +28,9 @@ export default function WelcomeBox({ isFirstVisit }: WelcomeBoxProps) {
 
   const getWelcomeMessage = () => {
     if (isFirstVisit || !nickname) {
-      return '✳️ Welcome!'
+      return `${randomEmoji} Welcome!`
     }
-    return `✳️ ${greetingInfo.greeting}, ${nickname} ${greetingInfo.emoji}`
+    return `${randomEmoji} ${greetingInfo.greeting}, ${nickname} ${greetingInfo.emoji}`
   }
 
   return (

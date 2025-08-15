@@ -20,7 +20,6 @@ export default function Terminal() {
   const [nickname, setNickname, isClient] = useLocalStorage('nickname', '')
   const [waitingForNickname, setWaitingForNickname] = useState(false)
   const [lastLoginTime, setLastLoginTime] = useState('')
-  const [isShowingAllCommands, setIsShowingAllCommands] = useState(false)
   const terminalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -46,6 +45,66 @@ export default function Terminal() {
 
   const getTimestamp = () => {
     return isClient ? getCurrentTimestamp() : ''
+  }
+
+  const renderResponseWithLinks = (text: string) => {
+    // Split by SVG tags first, then handle URLs within non-SVG parts
+    const svgRegex = /(<svg[^>]*>.*?<\/svg>)/g
+    const svgParts = text.split(svgRegex)
+    
+    return svgParts.map((part, index) => {
+      // If this part is an SVG, render it as HTML
+      if (svgRegex.test(part)) {
+        return (
+          <span
+            key={index}
+            dangerouslySetInnerHTML={{ __html: part }}
+            className="inline-block align-middle mr-2"
+          />
+        )
+      }
+      
+      // Handle URLs and email addresses in non-SVG parts
+      const urlRegex = /(https?:\/\/[^\s]+)/g
+      const emailRegex = /([\w\.-]+@[\w\.-]+\.\w+)/g
+      
+      // First handle URLs
+      const urlParts = part.split(urlRegex)
+      
+      return urlParts.map((urlPart, urlIndex) => {
+        if (urlRegex.test(urlPart)) {
+          return (
+            <a
+              key={`${index}-${urlIndex}`}
+              href={urlPart}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline"
+            >
+              {urlPart}
+            </a>
+          )
+        }
+        
+        // Handle email addresses in non-URL parts
+        const emailParts = urlPart.split(emailRegex)
+        
+        return emailParts.map((emailPart, emailIndex) => {
+          if (emailRegex.test(emailPart)) {
+            return (
+              <a
+                key={`${index}-${urlIndex}-${emailIndex}`}
+                href={`mailto:${emailPart}`}
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
+                {emailPart}
+              </a>
+            )
+          }
+          return emailPart
+        })
+      })
+    })
   }
 
   const handleCommandExecute = (command: string) => {
@@ -89,6 +148,10 @@ export default function Terminal() {
         link.download = 'wzhenkai_resume.md'
         link.click()
         response = getCommandResponse(command)
+      } else if (command === '/clear') {
+        // Clear terminal history
+        setCommandHistory([])
+        return // Don't add this command to history
       } else {
         response = getCommandResponse(command)
       }
@@ -125,9 +188,7 @@ export default function Terminal() {
           {/* Terminal Content */}
           <div 
             ref={terminalRef}
-            className={`p-3 sm:p-4 lg:p-6 overflow-y-auto ${
-              isShowingAllCommands ? 'max-h-none pb-64' : 'max-h-[75vh] sm:max-h-[70vh] pb-12'
-            }`}
+            className="p-3 sm:p-4 lg:p-6 overflow-y-auto max-h-[75vh] sm:max-h-[70vh] pb-12"
           >
             {/* Welcome Box */}
             <WelcomeBox isFirstVisit={isFirstVisit} />
@@ -151,7 +212,7 @@ export default function Terminal() {
                   
                   {/* Response */}
                   <div className="ml-4 text-terminal-text whitespace-pre-wrap text-sm leading-relaxed">
-                    {entry.response}
+                    {renderResponseWithLinks(entry.response)}
                   </div>
                 </div>
               ))}
@@ -170,7 +231,7 @@ export default function Terminal() {
                 onCommandExecute={handleCommandExecute}
                 commands={COMMANDS}
                 onScrollToBottom={scrollToBottom}
-                onShowingAllCommands={setIsShowingAllCommands}
+                terminalRef={terminalRef}
               />
             </div>
           </div>
