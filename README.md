@@ -1,6 +1,6 @@
-# Personal Terminal-Styled Website
+# Personal Terminal-Styled Portfolio
 
-A modern, interactive terminal-styled personal website built with Next.js and Tailwind CSS for Wong Zhen Kai.
+A modern, interactive terminal-styled personal portfolio website built with Next.js and Tailwind CSS for Wong Zhen Kai.
 
 ## 🚀 Features
 
@@ -22,11 +22,11 @@ Based on macOS terminal design with:
 
 ## 🛠 Tech Stack
 
-- **Framework**: Next.js 15.4.6 with App Router
+- **Framework**: Next.js 15.4.6 with App Router (Static Export Ready)
 - **Styling**: Tailwind CSS with custom terminal theme
 - **Language**: TypeScript for type safety
 - **State Management**: React hooks with localStorage integration
-- **Development**: Hot reload with npm dev server
+- **Architecture**: Client-side only, no backend dependencies
 
 ## 📱 Mobile Features
 
@@ -98,13 +98,23 @@ Based on macOS terminal design with:
 
 ## 📦 Build & Deploy
 
+### Development
 ```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
+npm run dev
 ```
+
+### Production Build
+```bash
+npm run build
+```
+
+### Static Export (for hosting on GitHub Pages, Netlify, etc.)
+```bash
+npm run build
+npm run export
+```
+
+The built static files will be in the `out/` directory, ready for deployment to any static hosting service.
 
 ## 🎨 Customization
 
