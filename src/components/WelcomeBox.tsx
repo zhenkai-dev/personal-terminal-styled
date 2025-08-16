@@ -45,7 +45,7 @@ export default function WelcomeBox({ isFirstVisit }: WelcomeBoxProps) {
         </div>
         
         <div className="text-sm text-gray-500">
-          domain: zhenkai-dev.com
+          domain: personal-terminal-styled.vercel.app
         </div>
       </div>
     </div>

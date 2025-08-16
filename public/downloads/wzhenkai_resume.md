@@ -104,7 +104,7 @@ Learn how to use AWS services and developer tools to develop secure and scalable
 ## GitHub, Website
 
 • [GitHub: https://github.com/zhenkai-dev](https://github.com/zhenkai-dev)
-• [Website: zhenkai-dev.com](https://zhenkai-dev.com)
+• [Website: https://personal-terminal-styled.vercel.app](https://personal-terminal-styled.vercel.app)
 
 ---
 
@@ -115,4 +115,4 @@ Learn how to use AWS services and developer tools to develop secure and scalable
 
 ---
 
-*Last updated: Aug 15th, 2025*
+*Last updated: Aug 16th, 2025*
