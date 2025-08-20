@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 interface Command {
   name: string
@@ -22,7 +22,7 @@ export default function CommandInput({ onCommandExecute, commands, onScrollToBot
   const inputRef = useRef<HTMLInputElement>(null)
   const commandContainerRef = useRef<HTMLDivElement>(null)
 
-  const scrollToShowSuggestions = () => {
+  const scrollToShowSuggestions = useCallback(() => {
     if (terminalRef?.current && commandContainerRef.current) {
       const terminal = terminalRef.current
       const commandContainer = commandContainerRef.current
@@ -47,7 +47,7 @@ export default function CommandInput({ onCommandExecute, commands, onScrollToBot
         })
       }
     }
-  }
+  }, [terminalRef])
 
   useEffect(() => {
     if (input.startsWith('/') && input.length > 1) {
@@ -68,7 +68,7 @@ export default function CommandInput({ onCommandExecute, commands, onScrollToBot
       setFilteredCommands([])
       setSelectedIndex(-1)
     }
-  }, [input, commands, onScrollToBottom])
+  }, [input, commands, onScrollToBottom, scrollToShowSuggestions])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
