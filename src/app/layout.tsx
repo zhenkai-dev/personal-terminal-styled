@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: 'Wong Zhen Kai - Full Stack Developer',
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>{children}</body>
+      <Analytics />
     </html>
   )
 }
