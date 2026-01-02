@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
+  verification: {
+    google: 'm-UcC8aSR0OV2U9Hqxdzi0iKFDephELAjzNNIZFi-f8',
+  },
 }
 
 export const viewport: Viewport = {
