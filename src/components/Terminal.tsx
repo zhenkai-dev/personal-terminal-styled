@@ -178,7 +178,7 @@ export default function Terminal() {
   }
 
   return (
-    <div className="min-h-screen bg-terminal-bg p-2 sm:p-4 lg:p-8">
+    <div className="bg-terminal-bg p-2 sm:p-4 lg:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Terminal Window */}
         <div className="bg-terminal-bg border border-terminal-border rounded-lg shadow-2xl overflow-hidden">
@@ -235,11 +235,6 @@ export default function Terminal() {
               />
             </div>
           </div>
-        </div>
-        
-        {/* Footer */}
-        <div className="text-center mt-6 text-gray-500 text-sm">
-          <p>Built with ❤️ by Wong Zhen Kai • Terminal-styled personal website</p>
         </div>
       </div>
     </div>
