@@ -5,9 +5,10 @@ export default function ResumeSummary() {
   return (
     <section
       aria-labelledby="resume-summary-heading"
-      className="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 pb-8"
+      className="px-2 sm:px-4 lg:px-8 pb-8"
     >
-      <div className="bg-terminal-bg border border-terminal-border rounded-lg p-4 sm:p-6 text-terminal-text font-mono min-w-0 space-y-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-terminal-bg border border-terminal-border rounded-lg p-4 sm:p-6 text-terminal-text font-mono min-w-0 space-y-6">
         <header className="border-b border-terminal-border pb-4 min-w-0">
           <h1
             id="resume-summary-heading"
@@ -159,6 +160,7 @@ export default function ResumeSummary() {
               Download Resume (Markdown)
             </a>
           </div>
+        </div>
         </div>
       </div>
     </section>
